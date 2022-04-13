@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2019-2020 Mika Tuupola
+Copyright (c) 2019-2021 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -100,16 +100,18 @@ bitmap_t *hagl_hal_init(void)
     return &fb;
 }
 
-void hagl_hal_flush()
+size_t hagl_hal_flush()
 {
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    size_t size = 0;
     /* Flush the whole back buffer with locking. */
     xSemaphoreTake(mutex, portMAX_DELAY);
-    mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
+    size = mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
     xSemaphoreGive(mutex);
+    return size;
 #else
     /* Flush the whole back buffer. */
-    mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
+    return mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
 }
 
@@ -170,6 +172,22 @@ void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, color_t color)
     for (uint16_t y = 0; y < height; y++) {
         *ptr = color;
         ptr += fb.pitch / (fb.depth / 8);
+    }
+#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    xSemaphoreGive(mutex);
+#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+}
+
+void hagl_hal_clear_screen()
+{
+#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    xSemaphoreTake(mutex, portMAX_DELAY);
+#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+    color_t *ptr = (color_t *) buffer1;
+    size_t count = DISPLAY_WIDTH * DISPLAY_HEIGHT;
+
+    while (--count) {
+        *ptr++ = 0x0000;
     }
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreGive(mutex);

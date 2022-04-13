@@ -3,7 +3,7 @@
 MIT License
 
 Copyright (c) 2017-2018 Espressif Systems (Shanghai) PTE LTD
-Copyright (c) 2019-2020 Mika Tuupola
+Copyright (c) 2019-2021 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -63,14 +63,8 @@ extern "C" {
     CONFIG_MIPI_DCS_ADDRESS_MODE_BGR \
 )
 
-typedef struct {
-    uint8_t command;
-    uint8_t data[16];
-    uint8_t count;
-} mipi_init_command_t;
-
 void mipi_display_init(spi_device_handle_t *spi);
-void mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint8_t *buffer);
+size_t mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint8_t *buffer);
 void mipi_display_ioctl(spi_device_handle_t spi, uint8_t command, uint8_t *data, size_t size);
 void mipi_display_close(spi_device_handle_t spi);
 

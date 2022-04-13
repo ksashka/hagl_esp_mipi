@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2019-2020 Mika Tuupola
+Copyright (c) 2019-2021 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -49,6 +49,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stddef.h>
 #include <bitmap.h>
 
 #include "hagl_hal.h"
@@ -60,6 +61,7 @@ extern "C" {
 #define HAGL_HAS_HAL_HLINE
 #define HAGL_HAS_HAL_VLINE
 #define HAGL_HAS_HAL_FLUSH
+#define HAGL_HAS_HAL_CLEAR_SCREEN
 
 /**
  * Put a pixel
@@ -118,7 +120,12 @@ void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t h, color_t color);
 /**
  * Flush back buffer to the display
  */
-void hagl_hal_flush();
+size_t hagl_hal_flush();
+
+/**
+ * Clear the display
+ */
+void hagl_hal_clear_screen();
 
 #ifdef __cplusplus
 }

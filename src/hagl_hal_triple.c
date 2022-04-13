@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2019-2020 Mika Tuupola
+Copyright (c) 2019-2021 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -121,7 +121,7 @@ bitmap_t *hagl_hal_init(void)
     return &fb;
 }
 
-void hagl_hal_flush()
+size_t hagl_hal_flush()
 {
     uint8_t *buffer = fb.buffer;
     if (fb.buffer == buffer1) {
@@ -129,7 +129,7 @@ void hagl_hal_flush()
     } else {
         fb.buffer = buffer1;
     }
-    mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) buffer);
+    return mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) buffer);
 }
 
 void hagl_hal_put_pixel(int16_t x0, int16_t y0, color_t color)
@@ -164,5 +164,18 @@ void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, color_t color)
         ptr += fb.pitch / (fb.depth / 8);
     }
 }
+
+void hagl_hal_clear_screen()
+{
+    color_t *ptr1 = (color_t *) buffer1;
+    color_t *ptr2 = (color_t *) buffer2;
+    size_t count = DISPLAY_WIDTH * DISPLAY_HEIGHT;
+
+    while (--count) {
+        *ptr1++ = 0x0000;
+        *ptr2++ = 0x0000;
+    }
+}
+
 
 #endif /* #ifdef CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING */
