@@ -149,7 +149,7 @@ static void mipi_display_spi_master_init(spi_device_handle_t *spi)
     };
     spi_device_interface_config_t devcfg = {
         .clock_speed_hz = CONFIG_MIPI_DISPLAY_SPI_CLOCK_SPEED_HZ,
-        .mode = 0,
+        .mode = CONFIG_MIPI_DISPLAY_SPI_MODE,
         .spics_io_num = CONFIG_MIPI_DISPLAY_PIN_CS,
         .queue_size = 64,
         /* Handles the D/C line */
